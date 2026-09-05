@@ -5,13 +5,13 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 
-export enum UsuarioRole {
+export enum UserRole {
   ADMIN = "ADMIN",
   ATENDENTE = "ATENDENTE",
 }
 
-@Entity("usuarios")
-export class Usuario {
+@Entity("users")
+export class User {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
 
@@ -24,8 +24,8 @@ export class Usuario {
   @Column("varchar")
   senha!: string;
 
-  @Column({ type: "enum", enum: UsuarioRole, default: UsuarioRole.ATENDENTE })
-  role!: UsuarioRole;
+  @Column({ type: "enum", enum: UserRole, default: UserRole.ATENDENTE })
+  role!: UserRole;
 
   @CreateDateColumn()
   criado_em!: Date;
