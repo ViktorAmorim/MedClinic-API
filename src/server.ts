@@ -3,12 +3,16 @@ import "dotenv/config";
 import express from "express";
 
 import { AppDataSource } from "./database/data-source";
-// import { routes } from "./routes";
+import { routes } from "./routes";
+import { errorMiddleware } from "./middlewares/errorMiddleware";
 
 const app = express();
 
 app.use(express.json());
-// futuramente: app.use(routes);
+app.use(routes);
+
+// sempre no final das rotas
+app.use(errorMiddleware);
 
 const localPort = process.env.PORT;
 
