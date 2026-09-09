@@ -1,3 +1,0 @@
-Hash de senha
-
-JWT
