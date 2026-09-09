@@ -67,48 +67,6 @@ O **MedClinic API** fornece a infraestrutura backend para gerenciar os colaborad
 
 ---
 
-## 🏛️ Arquitetura do Projeto
-
-A aplicação adota uma arquitetura em camadas baseada no padrão **Service-Repository**, promovendo o desacoplamento de responsabilidades, facilidade de manutenção e testabilidade:
-
-```mermaid
-flowchart TD
-    Client(["Cliente / Front-end"]) -->|Requisição HTTP| Routes["Camada de Rotas (routes)"]
-
-    subgraph Middlewares ["Middlewares"]
-        Val["validateDTO\n(class-validator)"]
-        Auth["authMiddleware\n(Valida JWT)"]
-        Role["roleMiddleware\n(Verifica RBAC)"]
-    end
-
-    Routes --> Middlewares
-    Middlewares -->|Payload Validado & Usuário Autenticado| Controllers["Controllers\n(Recepção & Resposta)"]
-    Controllers -->|Chamada de Casos de Uso| Services["Services\n(Regras de Negócio & Criptografia)"]
-    Services -->|Operações de Persistência| Repositories["Repositories / TypeORM"]
-    Repositories -->|Queries SQL| Database[("PostgreSQL")]
-
-    Controllers -.->|Lança Exceção| ErrorMiddleware["errorMiddleware\n(AppError Handler)"]
-    ErrorMiddleware -.->|Resposta de Erro Padronizada| Client
-```
-
-### Divisão das Camadas:
-
-1. **`Routes` (`src/routes/`)**: Mapeamento das rotas HTTP, acoplando middlewares e direcionando a execução para os respectivos controladores.
-2. **`Middlewares` (`src/middlewares/`)**:
-   - `validateDTO`: Valida os dados de entrada das requisições contra as regras declaradas nos DTOs antes de atingir o controller.
-   - `authMiddleware`: Extrai o Bearer token do header `Authorization`, valida a assinatura JWT e injeta os dados do usuário (`sub`, `role`) em `req.user`.
-   - `roleMiddleware`: Garante que apenas usuários com o perfil requerido (ex.: `ADMIN`) possam acessar rotas restritas.
-   - `asyncHandler`: Encapsula funções assíncronas de rotas para repassar erros não tratados diretamente ao pipeline de erro do Express.
-   - `errorMiddleware`: Intercepta erros conhecidos (`AppError`) e inesperados (500), devolvendo respostas padronizadas em formato JSON.
-3. **`Controllers` (`src/controllers/`)**: Responsáveis pelo recebimento dos parâmetros HTTP, chamada dos serviços adequados e formatação do status HTTP e corpo da resposta.
-4. **`Services` (`src/services/`)**: Centralizam a lógica de negócio (ex.: verificação de duplicidade de email, aplicação de hash com `bcrypt` e criação de entidades).
-5. **`Repositories` (`src/repositories/`)**: Encapsulam a comunicação com o banco de dados através da instância do repositório TypeORM.
-6. **`Entities` (`src/entities/`)**: Modelagem das tabelas do banco de dados relacional com decorators TypeORM.
-7. **`DTOs` (`src/dtos/`)**: Estruturas de dados fortemente tipadas contendo regras de validação para requests (`CreateUserDTO`, `LoginUserDTO`).
-8. **`Utils` (`src/utils/`)**: Funções reutilizáveis para geração/verificação de tokens JWT, hash de senhas e higienização de objetos (ex.: remoção do campo `senha` das respostas).
-
----
-
 ## 👥 Perfis de Acesso (RBAC)
 
 O sistema conta com dois perfis de acesso definidos pelo enum `UserRole`:
