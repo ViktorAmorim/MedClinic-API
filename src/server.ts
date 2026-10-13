@@ -19,7 +19,7 @@ const localPort = process.env.PORT;
 AppDataSource.initialize()
   .then(() => {
     app.listen(localPort, () => {
-      console.log(`Server iniciado na porta: ${localPort}`);
+      console.log(`Server iniciado na porta: http://localhost:${localPort}`);
     });
   })
   .catch((error) => console.log(error));
