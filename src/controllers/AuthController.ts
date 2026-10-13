@@ -5,57 +5,25 @@ import { comparePassword } from "../utils/password";
 import { LoginUserDTO } from "../dtos/LoginUserDTO";
 import { generateToken } from "../utils/jwt";
 import { removePassword } from "../utils/removePassword";
+import { AuthService } from "../services/AuthService";
+import { CreateUserDTO } from "../dtos/CreateUserDTO";
 
 export class AuthController {
+  private authService = new AuthService();
+
   async register(req: Request, res: Response): Promise<Response> {
-    const { nome, email, senha, role } = req.body;
+    const userData = req.body as CreateUserDTO;
 
-    if (!nome || !email || !senha) {
-      return res
-        .status(400)
-        .json({ message: "Nome, email e senha são obrigatórios" });
-    }
+    const user = await this.authService.register(userData);
 
-    const userService = new UserService();
-    const user = await userService.createUser({
-      nome,
-      email,
-      senha,
-      role,
-    });
-
-    return res.status(201).json(removePassword(user));
+    return res.status(201).json(user);
   }
 
   async login(req: Request, res: Response): Promise<Response> {
-    const { email, senha } = req.body as LoginUserDTO;
+    const dados = req.body as LoginUserDTO;
 
-    if (!email || !senha) {
-      return res
-        .status(400)
-        .json({ message: "Email e senha são obrigatorios" });
-    }
+    const resultado = await this.authService.login(dados);
 
-    const userService = new UserService();
-    const user = await userService.findByEmail(email);
-
-    if (!user) {
-      throw new AppError("Email ou senha incorretos", 401);
-    }
-
-    const passwordValid = await comparePassword(senha, user.senha);
-
-    if (!passwordValid) {
-      throw new AppError("Email ou senha incorretos", 401);
-    }
-
-    const token = generateToken({
-      sub: user.id,
-      role: user.role,
-    });
-
-    const userWithoutPassword = removePassword(user);
-
-    return res.status(200).json({ token, user: userWithoutPassword });
+    return res.status(200).json(resultado);
   }
 }
