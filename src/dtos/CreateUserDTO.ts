@@ -21,8 +21,4 @@ export class CreateUserDTO {
   @MinLength(6)
   @IsNotEmpty()
   senha!: string;
-
-  @IsOptional()
-  @IsEnum(UserRole)
-  role?: UserRole;
 }

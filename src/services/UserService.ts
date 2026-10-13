@@ -1,4 +1,4 @@
-import { User } from "../entities/User";
+import { User, UserRole } from "../entities/User";
 import { UserRepository } from "../repositories/UserRepository";
 import { CreateUserDTO } from "../dtos/CreateUserDTO";
 import { AppError } from "../errors/AppError";
@@ -19,6 +19,7 @@ export class UserService {
     const newUser = UserRepository.create({
       ...userData,
       senha: hashedPassword,
+      role: UserRole.ATENDENTE,
     });
 
     return await UserRepository.save(newUser);
