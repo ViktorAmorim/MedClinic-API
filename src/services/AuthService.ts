@@ -22,7 +22,7 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
 
     if (!user) {
-      throw new AppError("Email ou senha incorretos", 404);
+      throw new AppError("Email ou senha incorretos", 401);
     }
 
     const passwordValid = await comparePassword(senha, user.senha);
