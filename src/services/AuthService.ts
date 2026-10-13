@@ -28,7 +28,7 @@ export class AuthService {
     const passwordValid = await comparePassword(senha, user.senha);
 
     if (!passwordValid) {
-      throw new AppError("Email ou senha incorretos", 404);
+      throw new AppError("Email ou senha incorretos", 401);
     }
 
     const token = generateToken({ sub: user.id, role: user.role });
