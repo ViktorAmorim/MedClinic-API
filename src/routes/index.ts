@@ -4,12 +4,14 @@ import { userRoutes } from "../routes/user.routes";
 import { adminRoutes } from "./admin.routes";
 import { especialidadeRoutes } from "./especialidade.routes";
 import { medicoRoutes } from "./medico.routes";
+import { pacienteRoutes } from "./paciente.routes";
 
 const routes = Router();
 
 routes.use("/auth", authRoutes);
 routes.use("/user", userRoutes);
 routes.use("/medicos", medicoRoutes);
+routes.use("/pacientes", pacienteRoutes);
 routes.use("/especialidades", especialidadeRoutes);
 routes.use("/admin", adminRoutes);
 
