@@ -29,11 +29,22 @@ export class MedicoController {
       throw new AppError("O limite deve ser um inteiro entre 1 e 10.", 400);
     }
 
-    const nome = req.query.nome ? String(req.query.nome) : undefined;
+    const { nome, especialidadeId } = req.query;
 
-    const especialidadeId = req.query.especialidadeId
-      ? String(req.query.especialidadeId)
-      : undefined;
+    if (nome !== undefined && typeof nome !== "string") {
+      throw new AppError("O nome deve ser um texto.", 400);
+    }
+
+    if (especialidadeId !== undefined && typeof especialidadeId !== "string") {
+      throw new AppError("O ID da especialidade deve ser um texto.", 400);
+    }
+
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+    if (especialidadeId && !uuidRegex.test(especialidadeId)) {
+      throw new AppError("O ID da especialidade invalido.", 400);
+    }
 
     const filtros: {
       nome?: string;

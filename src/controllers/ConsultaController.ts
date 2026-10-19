@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { ConsultaService } from "../services/ConsultaService";
 import { removePassword } from "../utils/removePassword";
+import { AppError } from "../errors/AppError";
 
 const consultaService = new ConsultaService();
 
@@ -62,5 +63,70 @@ export class ConsultaController {
     };
 
     return res.status(200).json(resposta);
+  }
+
+  async listarTodas(req: Request, res: Response): Promise<Response> {
+    const page = Number(req.query.page ?? 1);
+    const limit = Number(req.query.limit ?? 10);
+
+    if (
+      !Number.isInteger(page) ||
+      page < 1 ||
+      !Number.isInteger(limit) ||
+      limit < 1
+    ) {
+      throw new AppError(
+        "Página e limite devem ser números inteiros positivos.",
+        400,
+      );
+    }
+
+    const filtros = {
+      dataInicio: req.query.dataInicio,
+      dataFim: req.query.dataFim,
+      status: req.query.status,
+      medicoId: req.query.medicoId,
+      pacienteId: req.query.pacienteId,
+    };
+
+    for (const valor of Object.values(filtros)) {
+      if (valor !== undefined && typeof valor !== "string") {
+        throw new AppError("Os filtros devem conter valores de texto.", 400);
+      }
+    }
+
+    const filtrosValidados = filtros as {
+      dataInicio?: string | undefined;
+      dataFim?: string | undefined;
+      status?: string | undefined;
+      medicoId?: string | undefined;
+      pacienteId?: string | undefined;
+    };
+
+    const { consultas, total } = await consultaService.listarTodas(
+      page,
+      limit,
+      filtrosValidados,
+    );
+
+    const consultasSeguras = consultas.map((consulta) => ({
+      ...consulta,
+      medico: {
+        ...consulta.medico,
+        user: removePassword(consulta.medico.user),
+      },
+      paciente: {
+        ...consulta.paciente,
+        user: removePassword(consulta.paciente.user),
+      },
+    }));
+
+    return res.status(200).json({
+      data: consultasSeguras,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    });
   }
 }

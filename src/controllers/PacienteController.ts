@@ -18,8 +18,11 @@ export class PacienteController {
     const page = Number(req.query.page ?? 1);
     const limit = Number(req.query.limit ?? 10);
 
-    const nome = req.query.nome ? String(req.query.nome) : undefined;
+    const { nome } = req.query;
 
+    if (nome !== undefined && typeof nome !== "string") {
+      throw new AppError("O nome deve ser um texto.", 400);
+    }
     if (!Number.isInteger(page) || page < 1) {
       throw new AppError(
         "A página deve ser um inteiro maior ou igual a 1.",
