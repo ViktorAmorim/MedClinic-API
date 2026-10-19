@@ -39,4 +39,7 @@ export class Consulta {
 
   @Column("text", { nullable: true })
   observacoes?: string;
+
+  @Column("text", { nullable: true })
+  diagnostico?: string;
 }
