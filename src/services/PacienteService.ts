@@ -11,6 +11,14 @@ import {
 import { UserRepository } from "../repositories/UserRepository";
 import { hashPassword } from "../utils/password";
 
+interface PacientePaginado {
+  dados: Paciente[];
+  total: number;
+  pagina: number;
+  limite: number;
+  totalPaginas: number;
+}
+
 export class PacienteService {
   async criar(dados: CreatePacienteDTO): Promise<Paciente> {
     const cpfExiste = await PacienteRepository.findOne({
@@ -62,7 +70,7 @@ export class PacienteService {
     page: number = 1,
     limit: number = 10,
     filtros: { nome?: string } = {},
-  ) {
+  ): Promise<PacientePaginado> {
     const { pacientes, total } = await listarPacientes(page, limit, filtros);
 
     return {
