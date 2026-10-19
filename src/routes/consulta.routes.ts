@@ -12,6 +12,13 @@ import { RegistrarAtendimentoDTO } from "../dtos/RegistrarAtendimentoDTO";
 const consultaRoutes = Router();
 const consultaController = new ConsultaController();
 
+consultaRoutes.get(
+  "/",
+  authMiddleware,
+  roleMiddleware(UserRole.ADMIN, UserRole.ATENDENTE),
+  asyncHandler((req, res) => consultaController.listarTodas(req, res)),
+);
+
 consultaRoutes.post(
   "/",
   authMiddleware,
