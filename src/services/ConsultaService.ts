@@ -1,8 +1,10 @@
 import { AgendarConsultaDTO } from "../dtos/AgendarConsultaDTO";
-import { Consulta } from "../entities/Consulta";
+import { RegistrarAtendimentoDTO } from "../dtos/RegistrarAtendimentoDTO";
+import { Consulta, ConsultaStatus } from "../entities/Consulta";
 import { AppError } from "../errors/AppError";
 import {
   buscarConflitoHorario,
+  buscarConsultaPorId,
   ConsultaRepository,
 } from "../repositories/ConsultaRepository";
 import { buscarMedicoPorId } from "../repositories/MedicoRepository";
@@ -62,6 +64,54 @@ export class ConsultaService {
     if (observacoes !== undefined) {
       consulta.observacoes = observacoes;
     }
+
+    return ConsultaRepository.save(consulta);
+  }
+
+  async realizarAtendimento(
+    id: string,
+    dados: RegistrarAtendimentoDTO,
+  ): Promise<Consulta> {
+    const consulta = await buscarConsultaPorId(id);
+
+    if (!consulta) {
+      throw new AppError("Consulta nao encontrada.", 404);
+    }
+
+    if (consulta.status !== ConsultaStatus.AGENDADA) {
+      throw new AppError(
+        "Apenas consultas agendadas podem ser realizadas.",
+        409,
+      );
+    }
+
+    const { observacoes, diagnostico } = dados;
+
+    if (observacoes !== undefined) {
+      consulta.observacoes = observacoes;
+    }
+
+    consulta.diagnostico = diagnostico;
+    consulta.status = ConsultaStatus.REALIZADA;
+
+    return ConsultaRepository.save(consulta);
+  }
+
+  async cancelarConsulta(id: string): Promise<Consulta> {
+    const consulta = await buscarConsultaPorId(id);
+
+    if (!consulta) {
+      throw new AppError("Consulta nao encontrada.", 404);
+    }
+
+    if (consulta.status !== ConsultaStatus.AGENDADA) {
+      throw new AppError(
+        "Apenas consultas agendadas podem ser canceladas.",
+        409,
+      );
+    }
+
+    consulta.status = ConsultaStatus.CANCELADA;
 
     return ConsultaRepository.save(consulta);
   }
