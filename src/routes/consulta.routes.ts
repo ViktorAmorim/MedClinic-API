@@ -6,6 +6,8 @@ import { UserRole } from "../entities/User";
 import { asyncHandler } from "../middlewares/asyncHandler";
 import { AgendarConsultaDTO } from "../dtos/AgendarConsultaDTO";
 import { validateDTO } from "../middlewares/validateDTO";
+import { validateUUID } from "../middlewares/validateUUID";
+import { RegistrarAtendimentoDTO } from "../dtos/RegistrarAtendimentoDTO";
 
 const consultaRoutes = Router();
 const consultaController = new ConsultaController();
@@ -16,6 +18,23 @@ consultaRoutes.post(
   roleMiddleware(UserRole.ADMIN, UserRole.ATENDENTE),
   validateDTO(AgendarConsultaDTO),
   asyncHandler((req, res) => consultaController.agendar(req, res)),
+);
+
+consultaRoutes.patch(
+  "/:id/atendimento",
+  authMiddleware,
+  roleMiddleware(UserRole.ADMIN, UserRole.ATENDENTE),
+  validateUUID,
+  validateDTO(RegistrarAtendimentoDTO),
+  asyncHandler((req, res) => consultaController.realizarAtendimento(req, res)),
+);
+
+consultaRoutes.patch(
+  "/:id/cancelamento",
+  authMiddleware,
+  roleMiddleware(UserRole.ADMIN, UserRole.ATENDENTE),
+  validateUUID,
+  asyncHandler((req, res) => consultaController.cancelarConsulta(req, res)),
 );
 
 export { consultaRoutes };
