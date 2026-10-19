@@ -16,3 +16,14 @@ export async function buscarConflitoHorario(
     },
   });
 }
+
+export async function buscarConsultaPorId(
+  id: string,
+): Promise<Consulta | null> {
+  const consulta = await ConsultaRepository.findOne({
+    where: { id },
+    relations: { medico: { user: true }, paciente: { user: true } },
+  });
+
+  return consulta;
+}
