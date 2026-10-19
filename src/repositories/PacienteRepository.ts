@@ -26,3 +26,14 @@ export async function listarPacientes(
 
   return { pacientes, total };
 }
+
+export async function buscarPacientePorId(
+  id: string,
+): Promise<Paciente | null> {
+  const paciente = await PacienteRepository.findOne({
+    where: { id },
+    relations: { user: true },
+  });
+
+  return paciente;
+}
