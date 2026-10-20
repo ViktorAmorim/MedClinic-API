@@ -6,6 +6,7 @@ import { especialidadeRoutes } from "./especialidade.routes";
 import { medicoRoutes } from "./medico.routes";
 import { pacienteRoutes } from "./paciente.routes";
 import { consultaRoutes } from "./consulta.routes";
+import { relatorioRoutes } from "./relatorios.routes";
 
 const routes = Router();
 
@@ -16,5 +17,6 @@ routes.use("/pacientes", pacienteRoutes);
 routes.use("/especialidades", especialidadeRoutes);
 routes.use("/admin", adminRoutes);
 routes.use("/consultas", consultaRoutes);
+routes.use("/relatorios", relatorioRoutes);
 
 export { routes };
