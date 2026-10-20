@@ -73,10 +73,11 @@ export class ConsultaController {
       !Number.isInteger(page) ||
       page < 1 ||
       !Number.isInteger(limit) ||
-      limit < 1
+      limit < 1 ||
+      limit > 10
     ) {
       throw new AppError(
-        "Página e limite devem ser números inteiros positivos.",
+        "Pagina deve ser um inteiro positivo e limite deve estar entre 1 e 10.",
         400,
       );
     }
@@ -122,11 +123,11 @@ export class ConsultaController {
     }));
 
     return res.status(200).json({
-      data: consultasSeguras,
+      dados: consultasSeguras,
       total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
+      pagina: page,
+      limite: limit,
+      totalPaginas: Math.ceil(total / limit),
     });
   }
 }
