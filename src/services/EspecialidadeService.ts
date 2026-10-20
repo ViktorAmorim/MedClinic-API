@@ -1,6 +1,9 @@
 import { Especialidade } from "../entities/Especialidade";
 import { AppError } from "../errors/AppError";
-import { EspecialidadeRepository } from "../repositories/EspecialidadeRepository";
+import {
+  EspecialidadeRepository,
+  listarEspecialidades,
+} from "../repositories/EspecialidadeRepository";
 
 export class EspecialidadeService {
   async criar(nome: string): Promise<Especialidade> {
@@ -16,8 +19,11 @@ export class EspecialidadeService {
     return await EspecialidadeRepository.save(newEspecialidade);
   }
 
-  async listarTodas(): Promise<Especialidade[]> {
-    return await EspecialidadeRepository.find({ order: { nome: "ASC" } });
+  async listarTodas(
+    page: number,
+    limit: number,
+  ): Promise<{ especialidades: Especialidade[]; total: number }> {
+    return listarEspecialidades(page, limit);
   }
 
   async buscarPorId(id: string): Promise<Especialidade | null> {
