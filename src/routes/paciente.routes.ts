@@ -7,6 +7,7 @@ import { validateDTO } from "../middlewares/validateDTO";
 import { asyncHandler } from "../middlewares/asyncHandler";
 import { CreatePacienteDTO } from "../dtos/CreatePacienteDTO";
 import { UpdatePacienteDTO } from "../dtos/UpdatePacienteDTO";
+import { validateUUID } from "../middlewares/validateUUID";
 
 const pacienteRoutes = Router();
 const pacienteController = new PacienteController();
@@ -30,6 +31,7 @@ pacienteRoutes.get(
   "/:id",
   authMiddleware,
   roleMiddleware(UserRole.ADMIN, UserRole.ATENDENTE),
+  validateUUID,
   asyncHandler((req, res) => pacienteController.buscarPorId(req, res)),
 );
 
@@ -45,6 +47,7 @@ pacienteRoutes.delete(
   "/:id",
   authMiddleware,
   roleMiddleware(UserRole.ADMIN),
+  validateUUID,
   asyncHandler((req, res) => pacienteController.excluir(req, res)),
 );
 
