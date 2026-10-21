@@ -185,4 +185,14 @@ export class ConsultaService {
       pacienteId,
     });
   }
+
+  async buscarPorId(id: string): Promise<Consulta> {
+    const consulta = await buscarConsultaPorId(id);
+
+    if (!consulta) {
+      throw new AppError("Consulta nao encontrada.", 404);
+    }
+
+    return consulta;
+  }
 }

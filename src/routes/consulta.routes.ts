@@ -19,6 +19,14 @@ consultaRoutes.get(
   asyncHandler((req, res) => consultaController.listarTodas(req, res)),
 );
 
+consultaRoutes.get(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(UserRole.ADMIN, UserRole.ATENDENTE),
+  validateUUID,
+  asyncHandler((req, res) => consultaController.buscarPorId(req, res)),
+);
+
 consultaRoutes.post(
   "/",
   authMiddleware,

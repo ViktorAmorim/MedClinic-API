@@ -130,4 +130,22 @@ export class ConsultaController {
       totalPaginas: Math.ceil(total / limit),
     });
   }
+
+  async buscarPorId(req: Request, res: Response): Promise<Response> {
+    const consulta = await consultaService.buscarPorId(req.params.id as string);
+
+    const resposta = {
+      ...consulta,
+      medico: {
+        ...consulta.medico,
+        user: removePassword(consulta.medico.user),
+      },
+      paciente: {
+        ...consulta.paciente,
+        user: removePassword(consulta.paciente.user),
+      },
+    };
+
+    return res.status(200).json(resposta);
+  }
 }
