@@ -39,6 +39,7 @@ pacienteRoutes.put(
   "/:id",
   authMiddleware,
   roleMiddleware(UserRole.ADMIN, UserRole.ATENDENTE),
+  validateUUID,
   validateDTO(UpdatePacienteDTO),
   asyncHandler((req, res) => pacienteController.atualizar(req, res)),
 );
