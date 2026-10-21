@@ -6,7 +6,12 @@ export function validateDTO(dtoClass: any) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const dto = plainToInstance(dtoClass, req.body);
 
-    const errors = await validate(dto);
+    const errors = await validate(dto, {
+      validationError: {
+        target: false,
+        value: false,
+      },
+    });
 
     if (errors.length > 0) {
       return res.status(400).json({
