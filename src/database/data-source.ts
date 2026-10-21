@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import dotenv from "dotenv";
 import { DataSource } from "typeorm";
 
@@ -23,7 +25,19 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
 
-  synchronize: true,
+  ssl:
+    process.env.DB_SSL === "true"
+      ? {
+          ca: fs.readFileSync(
+            path.resolve(process.cwd(), "src/database/certs/ca.pem"),
+            "utf8",
+          ),
+          rejectUnauthorized: true,
+        }
+      : false,
+
+  synchronize: false,
   logging: true,
   entities: ["src/entities/*.ts"],
+  migrations: ["src/database/migrations/*.ts"],
 });
