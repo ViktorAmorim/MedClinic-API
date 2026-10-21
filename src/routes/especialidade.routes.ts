@@ -7,6 +7,7 @@ import { validateDTO } from "../middlewares/validateDTO";
 import { UserRole } from "../entities/User";
 import { roleMiddleware } from "../middlewares/roleMiddleware";
 import { UpdateEspecialidadeDTO } from "../dtos/UpdateEspecialidadeDTO";
+import { validateUUID } from "../middlewares/validateUUID";
 
 const especialidadeRoutes = Router();
 const especialidadeController = new EspecialidadeController();
@@ -22,6 +23,7 @@ especialidadeRoutes.get(
   "/:id",
   authMiddleware,
   roleMiddleware(UserRole.ADMIN, UserRole.ATENDENTE),
+  validateUUID,
   asyncHandler((req, res) => especialidadeController.buscarPorId(req, res)),
 );
 
@@ -37,6 +39,7 @@ especialidadeRoutes.put(
   "/:id",
   authMiddleware,
   roleMiddleware(UserRole.ADMIN),
+  validateUUID,
   validateDTO(UpdateEspecialidadeDTO),
   asyncHandler((req, res) => especialidadeController.atualizar(req, res)),
 );
@@ -45,6 +48,7 @@ especialidadeRoutes.delete(
   "/:id",
   authMiddleware,
   roleMiddleware(UserRole.ADMIN),
+  validateUUID,
   asyncHandler((req, res) => especialidadeController.excluir(req, res)),
 );
 
