@@ -14,12 +14,14 @@ const especialidadeController = new EspecialidadeController();
 especialidadeRoutes.get(
   "/",
   authMiddleware,
+  roleMiddleware(UserRole.ADMIN, UserRole.ATENDENTE),
   asyncHandler((req, res) => especialidadeController.listarTodas(req, res)),
 );
 
 especialidadeRoutes.get(
   "/:id",
   authMiddleware,
+  roleMiddleware(UserRole.ADMIN, UserRole.ATENDENTE),
   asyncHandler((req, res) => especialidadeController.buscarPorId(req, res)),
 );
 
