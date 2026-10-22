@@ -9,6 +9,25 @@ import {
 import { Especialidade } from "./Especialidade";
 import { User } from "./User";
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Medico:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         crm:
+ *           type: string
+ *         telefone:
+ *           type: string
+ *         user:
+ *           $ref: '#/components/schemas/User'
+ *         especialidade:
+ *           $ref: '#/components/schemas/Especialidade'
+ */
 @Entity("medicos")
 export class Medico {
   @PrimaryGeneratedColumn("uuid")
