@@ -8,6 +8,43 @@ import {
   MinLength,
 } from "class-validator";
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     CreatePacienteDTO:
+ *       type: object
+ *       required: [nome, email, telefone, senha, cpf, dataNascimento]
+ *       properties:
+ *         nome:
+ *           type: string
+ *           minLength: 1
+ *           maxLength: 100
+ *           example: João Silva
+ *         email:
+ *           type: string
+ *           format: email
+ *           maxLength: 150
+ *           example: joao@example.com
+ *         telefone:
+ *           type: string
+ *           minLength: 1
+ *           maxLength: 20
+ *           example: "48999999999"
+ *         senha:
+ *           type: string
+ *           format: password
+ *           minLength: 6
+ *           example: Senha123
+ *         cpf:
+ *           type: string
+ *           pattern: '^\d{3}\.\d{3}\.\d{3}-\d{2}$'
+ *           example: "123.456.789-09"
+ *         dataNascimento:
+ *           type: string
+ *           format: date
+ *           example: "1998-05-15"
+ */
 export class CreatePacienteDTO {
   @IsString()
   @IsNotEmpty()

@@ -8,6 +8,35 @@ import {
 import { Medico } from "./Medico";
 import { Paciente } from "./Paciente";
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Consulta:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *         medico:
+ *           $ref: '#/components/schemas/Medico'
+ *         paciente:
+ *           $ref: '#/components/schemas/Paciente'
+ *         dataHora:
+ *           type: string
+ *           format: date-time
+ *           example: "2027-05-15T14:30:00-03:00"
+ *         status:
+ *           type: string
+ *           enum: [AGENDADA, REALIZADA, CANCELADA]
+ *           example: AGENDADA
+ *         observacoes:
+ *           type: string
+ *           nullable: true
+ *         diagnostico:
+ *           type: string
+ *           nullable: true
+ */
 export enum ConsultaStatus {
   AGENDADA = "AGENDADA",
   REALIZADA = "REALIZADA",

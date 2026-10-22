@@ -5,6 +5,33 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           format: uuid
+ *           example: "3c0c4c4c-3c0c-4c0c-3c0c-3c0c0c0c0c0c"
+ *         nome:
+ *           type: string
+ *           example: "João da Silva"
+ *         email:
+ *           type: string
+ *           format: email
+ *           example: "joao@medclinic"
+ *         role:
+ *           type: string
+ *           enum: [ADMIN, ATENDENTE, MEDICO, PACIENTE]
+ *           example: "ATENDENTE"
+ *         criado_em:
+ *           type: string
+ *           format: date-time
+ *           example: "2022-01-01T00:00:00.000Z"
+ */
 export enum UserRole {
   ADMIN = "ADMIN",
   ATENDENTE = "ATENDENTE",

@@ -7,13 +7,70 @@ import { LoginUserDTO } from "../dtos/LoginUserDTO";
 
 const authRoutes = Router();
 const authController = new AuthController();
-
+/**
+ * @swagger
+ * /auth/register:
+ *   post:
+ *     summary: Cadastrar novo usuário
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateUserDTO'
+ *     responses:
+ *       201:
+ *         description: Usuário cadastrado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Dados de entrada inválidos.
+ *       409:
+ *         description: Email já cadastrado.
+ *       500:
+ *         description: Erro interno no servidor.
+ */
 authRoutes.post(
   "/register",
   validateDTO(CreateUserDTO),
   asyncHandler((req, res) => authController.register(req, res)),
 );
 
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Autenticar usuário
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginUserDTO'
+ *     responses:
+ *       200:
+ *         description: Login realizado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token de autenticação.
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Dados de entrada invalidos.
+ *       401:
+ *         description: Email ou senha incorretos.
+ *       500:
+ *         description: Erro interno no servidor.
+ */
 authRoutes.post(
   "/login",
   validateDTO(LoginUserDTO),
