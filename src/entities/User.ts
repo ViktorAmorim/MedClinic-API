@@ -25,8 +25,8 @@ import {
  *           example: "joao@medclinic"
  *         role:
  *           type: string
+ *           description: Perfil de acesso do usuário autenticado.
  *           enum: [ADMIN, ATENDENTE, MEDICO, PACIENTE]
- *           example: "ATENDENTE"
  *         criado_em:
  *           type: string
  *           format: date-time
