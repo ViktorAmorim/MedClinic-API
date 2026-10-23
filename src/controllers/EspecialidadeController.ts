@@ -42,15 +42,13 @@ export class EspecialidadeController {
       limit,
     );
 
-    return res
-      .status(200)
-      .json({
-        dados: especialidades,
-        total,
-        pagina: page,
-        limite: limit,
-        totalPaginas: Math.ceil(total / limit),
-      });
+    return res.status(200).json({
+      dados: especialidades,
+      total,
+      pagina: page,
+      limite: limit,
+      totalPaginas: Math.ceil(total / limit),
+    });
   }
 
   async buscarPorId(req: Request, res: Response): Promise<Response> {
@@ -89,12 +87,13 @@ export class EspecialidadeController {
   async excluir(req: Request, res: Response): Promise<Response> {
     const especialidadeService = new EspecialidadeService();
     const id = req.params.id;
+    const adminId = req.user.sub as string;
 
     if (typeof id !== "string" || !id) {
       throw new AppError("Especialidade invalida.", 400);
     }
 
-    await especialidadeService.excluir(id);
+    await especialidadeService.excluir(id, adminId);
 
     return res
       .status(200)

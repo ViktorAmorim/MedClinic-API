@@ -6,6 +6,7 @@ import { UserService } from "./UserService";
 import { AppDataSource } from "../database/data-source";
 import { Especialidade } from "../entities/Especialidade";
 import { EntityManager } from "typeorm";
+import { logger } from "../config/logger";
 
 import {
   listarMedicos,
@@ -30,9 +31,13 @@ export class MedicoService {
   private userService = new UserService();
 
   async criar(dados: CreateMedicoDTO): Promise<Medico> {
-    return await AppDataSource.transaction((manager) =>
+    const medicoCriado = await AppDataSource.transaction((manager) =>
       this.persistirMedico(dados, manager),
     );
+
+    logger.info(`Médico criado com sucesso | Medico ID: ${medicoCriado.id}.`);
+
+    return medicoCriado;
   }
 
   async listar(
@@ -102,55 +107,62 @@ export class MedicoService {
   }
 
   async atualizar(id: string, dados: UpdateMedicoDTO): Promise<Medico> {
-    return await AppDataSource.transaction(async (manager) => {
-      const medico = await manager.findOne(Medico, {
-        where: { id },
-        relations: {
-          user: true,
-          especialidade: true,
-        },
-      });
+    const medicoAtualizado = await AppDataSource.transaction(
+      async (manager) => {
+        const medico = await manager.findOne(Medico, {
+          where: { id },
+          relations: {
+            user: true,
+            especialidade: true,
+          },
+        });
 
-      if (!medico) {
-        throw new AppError("Médico não encontrado.", 404);
-      }
+        if (!medico) {
+          throw new AppError("Médico não encontrado.", 404);
+        }
 
-      const crmExistente = await manager.findOne(Medico, {
-        where: { crm: dados.crm },
-      });
+        const crmExistente = await manager.findOne(Medico, {
+          where: { crm: dados.crm },
+        });
 
-      if (crmExistente && crmExistente.id !== medico.id) {
-        throw new AppError("CRM já cadastrado.", 409);
-      }
+        if (crmExistente && crmExistente.id !== medico.id) {
+          throw new AppError("CRM já cadastrado.", 409);
+        }
 
-      const emailExistente = await manager.findOne(User, {
-        where: { email: dados.email },
-      });
+        const emailExistente = await manager.findOne(User, {
+          where: { email: dados.email },
+        });
 
-      if (emailExistente && emailExistente.id !== medico.user.id) {
-        throw new AppError("Email já cadastrado.", 409);
-      }
+        if (emailExistente && emailExistente.id !== medico.user.id) {
+          throw new AppError("Email já cadastrado.", 409);
+        }
 
-      const especialidade = await manager.findOne(Especialidade, {
-        where: { id: dados.especialidadeId },
-      });
+        const especialidade = await manager.findOne(Especialidade, {
+          where: { id: dados.especialidadeId },
+        });
 
-      if (!especialidade) {
-        throw new AppError("Especialidade não encontrada.", 404);
-      }
+        if (!especialidade) {
+          throw new AppError("Especialidade não encontrada.", 404);
+        }
 
-      medico.user.nome = dados.nome;
-      medico.user.email = dados.email;
-      medico.crm = dados.crm;
-      medico.telefone = dados.telefone;
-      medico.especialidade = especialidade;
+        medico.user.nome = dados.nome;
+        medico.user.email = dados.email;
+        medico.crm = dados.crm;
+        medico.telefone = dados.telefone;
+        medico.especialidade = especialidade;
 
-      await manager.save(medico.user);
-      return await manager.save(medico);
-    });
+        await manager.save(medico.user);
+        return await manager.save(medico);
+      },
+    );
+    logger.info(
+      `Médico atualizado com sucesso | Medico ID: ${medicoAtualizado.id}.`,
+    );
+
+    return medicoAtualizado;
   }
 
-  async excluir(id: string): Promise<void> {
+  async excluir(id: string, adminId: string): Promise<void> {
     await AppDataSource.transaction(async (manager) => {
       const medico = await manager.findOne(Medico, {
         where: { id },
@@ -162,5 +174,9 @@ export class MedicoService {
 
       await manager.remove(medico);
     });
+
+    logger.info(
+      `Médico excluído com sucesso | Medico ID: ${id} | Por Admin ID: ${adminId}.`,
+    );
   }
 }

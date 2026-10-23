@@ -74,7 +74,9 @@ export class PacienteController {
   async excluir(req: Request, res: Response): Promise<Response> {
     const id = req.params.id as string;
 
-    await this.pacienteService.excluir(id);
+    const adminId = req.user.sub as string;
+
+    await this.pacienteService.excluir(id, adminId);
 
     return res.status(200).json({ message: "Paciente excluido com sucesso." });
   }

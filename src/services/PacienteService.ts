@@ -10,6 +10,7 @@ import {
 } from "../repositories/PacienteRepository";
 import { UserRepository } from "../repositories/UserRepository";
 import { hashPassword } from "../utils/password";
+import { logger } from "../config/logger";
 
 interface PacientePaginado {
   dados: Paciente[];
@@ -45,7 +46,7 @@ export class PacienteService {
 
     const senhaHash = await hashPassword(dados.senha);
 
-    return await AppDataSource.transaction(async (manager) => {
+    const pacienteCriado = await AppDataSource.transaction(async (manager) => {
       const usuario = manager.create(User, {
         nome: dados.nome,
         email: dados.email,
@@ -64,6 +65,11 @@ export class PacienteService {
 
       return await manager.save(paciente);
     });
+
+    logger.info(
+      `Paciente cadastrado com sucesso | Paciente ID: ${pacienteCriado.id}.`,
+    );
+    return pacienteCriado;
   }
 
   async listar(
@@ -144,13 +150,20 @@ export class PacienteService {
       paciente.telefone = dados.telefone;
     }
 
-    return await AppDataSource.transaction(async (manager) => {
-      await manager.save(paciente.user);
-      return await manager.save(paciente);
-    });
+    const pacienteAtualizado = await AppDataSource.transaction(
+      async (manager) => {
+        await manager.save(paciente.user);
+        return await manager.save(paciente);
+      },
+    );
+
+    logger.info(
+      `Paciente atualizado com sucesso | Paciente ID: ${pacienteAtualizado.id}.`,
+    );
+    return pacienteAtualizado;
   }
 
-  async excluir(id: string): Promise<void> {
+  async excluir(id: string, adminId: string): Promise<void> {
     await AppDataSource.transaction(async (manager) => {
       const paciente = await manager.findOne(Paciente, {
         where: { id },
@@ -162,5 +175,9 @@ export class PacienteService {
 
       await manager.remove(paciente);
     });
+
+    logger.info(
+      `Paciente excluído com sucesso | Paciente ID: ${id}  | Por Admin ID: ${adminId}.`,
+    );
   }
 }

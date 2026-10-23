@@ -4,7 +4,7 @@ import {
   EspecialidadeRepository,
   listarEspecialidades,
 } from "../repositories/EspecialidadeRepository";
-
+import { logger } from "../config/logger";
 export class EspecialidadeService {
   async criar(nome: string): Promise<Especialidade> {
     const existingEspecialidade = await EspecialidadeRepository.findOne({
@@ -16,7 +16,14 @@ export class EspecialidadeService {
     }
 
     const newEspecialidade = EspecialidadeRepository.create({ nome });
-    return await EspecialidadeRepository.save(newEspecialidade);
+
+    const especialidadeCriada =
+      await EspecialidadeRepository.save(newEspecialidade);
+
+    logger.info(
+      `Especialidade criada com sucesso | Especialidade ID: ${especialidadeCriada.id}.`,
+    );
+    return especialidadeCriada;
   }
 
   async listarTodas(
@@ -55,10 +62,16 @@ export class EspecialidadeService {
     }
 
     especialidade.nome = nome;
-    return await EspecialidadeRepository.save(especialidade);
+    const especialidadeAtualizada =
+      await EspecialidadeRepository.save(especialidade);
+
+    logger.info(
+      `Especialidade atualizada com sucesso | Especialidade ID: ${especialidadeAtualizada.id}.`,
+    );
+    return especialidadeAtualizada;
   }
 
-  async excluir(id: string): Promise<void> {
+  async excluir(id: string, adminId: string): Promise<void> {
     const especialidade = await EspecialidadeRepository.findOne({
       where: { id },
       relations: { medicos: true },
@@ -73,5 +86,9 @@ export class EspecialidadeService {
     }
 
     await EspecialidadeRepository.remove(especialidade);
+
+    logger.info(
+      `Especialidade excluida com sucesso | Especialidade ID: ${id} | Por Admin ID: ${adminId}.`,
+    );
   }
 }

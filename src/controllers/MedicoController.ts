@@ -93,8 +93,9 @@ export class MedicoController {
 
   async excluir(req: Request, res: Response): Promise<Response> {
     const id = req.params.id as string;
+    const adminId = req.user.sub as string;
 
-    await this.medicoService.excluir(id);
+    await this.medicoService.excluir(id, adminId);
 
     return res.status(200).json({
       mensagem: "Médico excluído com sucesso.",
