@@ -1,3 +1,5 @@
+import { logger } from "./config/logger";
+import { requestLogger } from "./middlewares/requestLogger";
 import "reflect-metadata";
 import "dotenv/config";
 import express from "express";
@@ -12,6 +14,7 @@ import { swaggerSpec } from "./config/swagger";
 const app = express();
 
 app.use(express.json());
+app.use(requestLogger);
 app.use(routes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
@@ -23,10 +26,10 @@ const localPort = process.env.PORT;
 AppDataSource.initialize()
   .then(() => {
     app.listen(localPort, () => {
-      console.log(
-        `Servidor iniciado na porta: http://localhost:${localPort} \n
-Swagger UI: http://localhost:${localPort}/api-docs`,
-      );
+      logger.info(`Servidor iniciado na porta: http://localhost:${localPort}`);
+      logger.info(`Swagger UI: http://localhost:${localPort}/api-docs`);
     });
   })
-  .catch((error) => console.log(error));
+  .catch((error) =>
+    logger.error("Erro ao inicializar a conexão com o banco de dados", error),
+  );
