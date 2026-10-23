@@ -1,12 +1,13 @@
 import { User, UserRole } from "../../entities/User";
 import { hashPassword } from "../../utils/password";
 import { AppDataSource } from "../data-source";
+import { logger } from "../../config/logger";
 
 async function seedAdmin(): Promise<void> {
   try {
     await AppDataSource.initialize();
 
-    console.log("Conexão com o banco de dados estabelecida.");
+    logger.info("Conexão com o banco de dados estabelecida.");
 
     const nome = process.env.ADMIN_NAME;
     const email = process.env.ADMIN_EMAIL;
@@ -28,7 +29,7 @@ async function seedAdmin(): Promise<void> {
           "O e-mail informado já pertence a um usuário sem permissão de administrador.",
         );
       }
-      console.log("Admin ja cadastrado.");
+      logger.info("Admin ja cadastrado.");
       return;
     }
 
@@ -43,9 +44,9 @@ async function seedAdmin(): Promise<void> {
 
     await userRepository.save(admin);
 
-    console.log("Administrador inicial cadastrado com sucesso.");
+    logger.info("Administrador inicial cadastrado com sucesso.");
   } catch (error) {
-    console.error("Erro ao executar o seed:", error);
+    logger.error("Erro ao executar o seed:", error);
     process.exitCode = 1;
   } finally {
     if (AppDataSource.isInitialized) {
