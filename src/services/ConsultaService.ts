@@ -11,6 +11,7 @@ import {
 import { buscarMedicoPorId } from "../repositories/MedicoRepository";
 import { buscarPacientePorId } from "../repositories/PacienteRepository";
 import { validarData } from "../utils/validarData";
+import { logger } from "../config/logger";
 
 export class ConsultaService {
   async agendar(dados: AgendarConsultaDTO): Promise<Consulta> {
@@ -30,6 +31,9 @@ export class ConsultaService {
     if (Number.isNaN(dataConsulta.getTime())) {
       throw new AppError("Data inválida.", 400);
     }
+    logger.debug(
+      `Validando horário para agendamento | Médico ID: ${medicoId}.`,
+    );
 
     if (
       dataConsulta.getUTCMinutes() % 30 !== 0 ||
@@ -67,7 +71,11 @@ export class ConsultaService {
       consulta.observacoes = observacoes;
     }
 
-    return ConsultaRepository.save(consulta);
+    const consultaAgendada = await ConsultaRepository.save(consulta);
+    logger.info(
+      `Consulta agendada com sucesso | Consulta ID: ${consultaAgendada.id} | Médico ID: ${medicoId} | Paciente ID: ${pacienteId}.`,
+    );
+    return consultaAgendada;
   }
 
   async realizarAtendimento(
@@ -96,7 +104,12 @@ export class ConsultaService {
     consulta.diagnostico = diagnostico;
     consulta.status = ConsultaStatus.REALIZADA;
 
-    return ConsultaRepository.save(consulta);
+    const consultaRealizada = await ConsultaRepository.save(consulta);
+
+    logger.info(
+      `Consulta realizada com sucesso | Consulta ID: ${consultaRealizada.id}.`,
+    );
+    return consultaRealizada;
   }
 
   async cancelarConsulta(id: string): Promise<Consulta> {
@@ -115,7 +128,12 @@ export class ConsultaService {
 
     consulta.status = ConsultaStatus.CANCELADA;
 
-    return ConsultaRepository.save(consulta);
+    const consultaCancelada = await ConsultaRepository.save(consulta);
+
+    logger.info(
+      `Consulta cancelada com sucesso | Consulta ID: ${consultaCancelada.id}.`,
+    );
+    return consultaCancelada;
   }
 
   async listarTodas(
