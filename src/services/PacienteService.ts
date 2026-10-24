@@ -11,6 +11,7 @@ import {
 import { UserRepository } from "../repositories/UserRepository";
 import { hashPassword } from "../utils/password";
 import { logger } from "../config/logger";
+import { VincularPacienteDTO } from "../dtos/VincularPacienteDTO";
 
 interface PacientePaginado {
   dados: Paciente[];
@@ -69,6 +70,66 @@ export class PacienteService {
     logger.info(
       `Paciente cadastrado com sucesso | Paciente ID: ${pacienteCriado.id}.`,
     );
+    return pacienteCriado;
+  }
+
+  async vincular(dados: VincularPacienteDTO): Promise<Paciente> {
+    const pacienteCriado = await AppDataSource.transaction(async (manager) => {
+      const usuario = await manager.findOne(User, {
+        where: { id: dados.userId },
+        lock: { mode: "pessimistic_write" },
+      });
+
+      if (!usuario) {
+        throw new AppError("Usuário não encontrado.", 404);
+      }
+
+      if (usuario.role !== null) {
+        throw new AppError("O usuário já possui um perfil atribuído.", 409);
+      }
+
+      const pacienteExistente = await manager.findOne(Paciente, {
+        where: { user: { id: usuario.id } },
+      });
+
+      if (pacienteExistente) {
+        throw new AppError(
+          "Este usuário já possui um cadastro de paciente.",
+          409,
+        );
+      }
+
+      const cpfExiste = await manager.findOne(Paciente, {
+        where: { cpf: dados.cpf },
+      });
+
+      if (cpfExiste) {
+        throw new AppError("CPF já cadastrado.", 409);
+      }
+
+      const dataNascimento = new Date(dados.dataNascimento);
+
+      if (dataNascimento > new Date()) {
+        throw new AppError("A data de nascimento não pode ser futura.", 400);
+      }
+
+      usuario.role = UserRole.PACIENTE;
+      await manager.save(usuario);
+
+      const paciente = manager.create(Paciente, {
+        cpf: dados.cpf,
+        telefone: dados.telefone,
+        dataNascimento,
+        user: usuario,
+      });
+
+      return await manager.save(paciente);
+    });
+
+    logger.info(
+      `Usuário vinculado como paciente com sucesso | Paciente ID: ${pacienteCriado.id} | Usuário ID: ${dados.userId}.`,
+    );
+
     return pacienteCriado;
   }
 

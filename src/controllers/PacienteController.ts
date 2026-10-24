@@ -14,6 +14,14 @@ export class PacienteController {
       .json({ ...paciente, user: removePassword(paciente.user) });
   }
 
+  async vincular(req: Request, res: Response): Promise<Response> {
+    const paciente = await this.pacienteService.vincular(req.body);
+
+    return res
+      .status(201)
+      .json({ ...paciente, user: removePassword(paciente.user) });
+  }
+
   async listar(req: Request, res: Response): Promise<Response> {
     const page = Number(req.query.page ?? 1);
     const limit = Number(req.query.limit ?? 10);
