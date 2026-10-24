@@ -1,15 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../errors/AppError";
-import { verificarToken } from "../utils/jwt";
+import { TokenPayload, verificarToken } from "../utils/jwt";
 import { logger } from "../config/logger";
 
 declare global {
   namespace Express {
     interface Request {
-      user: {
-        sub: string;
-        role: string;
-      };
+      user: TokenPayload;
     }
   }
 }
@@ -37,14 +34,18 @@ export function authMiddleware(
     throw new AppError("Token nao informado", 401);
   }
 
+  let tokenPayload: TokenPayload;
+
   try {
-    const tokenPayload = verificarToken(token);
-    req.user = tokenPayload;
-    next();
+    tokenPayload = verificarToken(token);
   } catch (error) {
     logger.warn(
       `Autenticação negada | Token invalido ou expirado | Rota: ${req.originalUrl.split("?")[0]}`,
     );
+
     throw new AppError("Token invalido", 401);
   }
+
+  req.user = tokenPayload;
+  next();
 }

@@ -8,7 +8,7 @@ import { EntityManager } from "typeorm";
 export class UserService {
   async createUser(
     userData: CreateUserDTO,
-    role: UserRole = UserRole.ATENDENTE,
+    role: UserRole | null = null,
     manager?: EntityManager,
   ): Promise<User> {
     const existingUser = manager

@@ -25,7 +25,8 @@ import {
  *           example: "joao@medclinic"
  *         role:
  *           type: string
- *           description: Perfil de acesso do usuário autenticado.
+ *           nullable: true
+ *           description: Perfil de acesso do usuário autenticado. Null indica que ainda não possui um perfil atribuído.
  *           enum: [ADMIN, ATENDENTE, MEDICO, PACIENTE]
  *         criado_em:
  *           type: string
@@ -53,8 +54,8 @@ export class User {
   @Column("varchar")
   senha!: string;
 
-  @Column({ type: "enum", enum: UserRole, default: UserRole.ATENDENTE })
-  role!: UserRole;
+  @Column({ type: "enum", enum: UserRole, nullable: true, default: null })
+  role!: UserRole | null;
 
   @CreateDateColumn()
   criado_em!: Date;

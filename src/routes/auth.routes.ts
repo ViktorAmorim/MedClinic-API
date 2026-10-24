@@ -21,11 +21,20 @@ const authController = new AuthController();
  *             $ref: '#/components/schemas/CreateUserDTO'
  *     responses:
  *       201:
- *         description: Usuário cadastrado com sucesso.
+ *         description: Usuário cadastrado com sucesso, sem perfil de acesso atribuído.
  *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/User'
+ *             examples:
+ *               usuarioSemPerfil:
+ *                 summary: Cadastro público sem perfil de acesso
+ *                 value:
+ *                   id: "3c0c4c4c-3c0c-4c0c-3c0c-3c0c0c0c0c0c"
+ *                   nome: "João da Silva"
+ *                   email: "joao@medclinic.com"
+ *                   role: null
+ *                   criado_em: "2026-10-23T23:00:00.000Z"
  *       400:
  *         description: Dados de entrada inválidos.
  *       409:
@@ -64,6 +73,17 @@ authRoutes.post(
  *                   description: Token de autenticação.
  *                 user:
  *                   $ref: '#/components/schemas/User'
+ *             examples:
+ *               loginSucesso:
+ *                 summary: Login de usuário autenticado
+ *                 value:
+ *                   token: "eyJhbGciOiJIUzI1NiIs..."
+ *                   user:
+ *                     id: "3c0c4c4c-3c0c-4c0c-3c0c-3c0c0c0c0c0c"
+ *                     nome: "João da Silva"
+ *                     email: "joao@medclinic.com"
+ *                     role: null
+ *                     criado_em: "2026-10-23T23:00:00.000Z"
  *       400:
  *         description: Dados de entrada invalidos.
  *       401:

@@ -10,7 +10,7 @@ if (!JWT_SECRET || !JWT_EXPIRES_IN) {
 
 export interface TokenPayload {
   sub: string;
-  role: UserRole;
+  role: UserRole | null;
 }
 
 export function generateToken(payload: TokenPayload): string {

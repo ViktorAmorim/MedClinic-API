@@ -1,10 +1,5 @@
 import { Request, Response } from "express";
-import { UserService } from "../services/UserService";
-import { AppError } from "../errors/AppError";
-import { comparePassword } from "../utils/password";
 import { LoginUserDTO } from "../dtos/LoginUserDTO";
-import { generateToken } from "../utils/jwt";
-import { removePassword } from "../utils/removePassword";
 import { AuthService } from "../services/AuthService";
 import { CreateUserDTO } from "../dtos/CreateUserDTO";
 
