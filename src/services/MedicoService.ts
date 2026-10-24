@@ -7,6 +7,7 @@ import { AppDataSource } from "../database/data-source";
 import { Especialidade } from "../entities/Especialidade";
 import { EntityManager } from "typeorm";
 import { logger } from "../config/logger";
+import { VincularMedicoDTO } from "../dtos/VincularMedicoDTO";
 
 import {
   listarMedicos,
@@ -36,6 +37,68 @@ export class MedicoService {
     );
 
     logger.info(`Médico criado com sucesso | Medico ID: ${medicoCriado.id}.`);
+
+    return medicoCriado;
+  }
+
+  async vincular(dados: VincularMedicoDTO): Promise<Medico> {
+    const medicoCriado = await AppDataSource.transaction(async (manager) => {
+      const usuario = await manager.findOne(User, {
+        where: { id: dados.userId },
+        lock: { mode: "pessimistic_write" },
+      });
+
+      if (!usuario) {
+        throw new AppError("Usuário não encontrado.", 404);
+      }
+
+      if (usuario.role !== null) {
+        throw new AppError("O usuário já possui um perfil atribuído.", 409);
+      }
+
+      const medicoExistente = await manager.findOne(Medico, {
+        where: { user: { id: usuario.id } },
+      });
+
+      if (medicoExistente) {
+        throw new AppError(
+          "Este usuário já possui um cadastro de médico.",
+          409,
+        );
+      }
+
+      const crmExiste = await manager.findOne(Medico, {
+        where: { crm: dados.crm },
+      });
+
+      if (crmExiste) {
+        throw new AppError("CRM já cadastrado.", 409);
+      }
+
+      const especialidade = await manager.findOne(Especialidade, {
+        where: { id: dados.especialidadeId },
+      });
+
+      if (!especialidade) {
+        throw new AppError("Especialidade não encontrada.", 404);
+      }
+
+      usuario.role = UserRole.MEDICO;
+      await manager.save(usuario);
+
+      const medico = manager.create(Medico, {
+        crm: dados.crm,
+        telefone: dados.telefone,
+        user: usuario,
+        especialidade,
+      });
+
+      return await manager.save(medico);
+    });
+
+    logger.info(
+      `Usuário vinculado como médico com sucesso | Médico ID: ${medicoCriado.id} | Usuário ID: ${dados.userId}.`,
+    );
 
     return medicoCriado;
   }

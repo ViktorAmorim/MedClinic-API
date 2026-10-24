@@ -8,6 +8,7 @@ import { roleMiddleware } from "../middlewares/roleMiddleware";
 import { UserRole } from "../entities/User";
 import { CreateMedicoDTO } from "../dtos/CreateMedicoDTO";
 import { UpdateMedicoDTO } from "../dtos/UpdateMedicoDTO";
+import { VincularMedicoDTO } from "../dtos/VincularMedicoDTO";
 
 const medicoRoutes = Router();
 const medicoController = new MedicoController();
@@ -52,6 +53,69 @@ medicoRoutes.post(
   roleMiddleware(UserRole.ADMIN),
   validateDTO(CreateMedicoDTO),
   asyncHandler((req, res) => medicoController.criar(req, res)),
+);
+
+/**
+ * @swagger
+ * /medicos/vincular:
+ *   post:
+ *     summary: Vincular um usuário existente como médico
+ *     description: >
+ *       Permite que um administrador vincule um usuário existente,
+ *       com role null, a um novo cadastro de médico.
+ *       O usuário mantém seu ID original e recebe automaticamente
+ *       a role MEDICO.
+ *       O CRM deve ser único e a especialidade deve estar cadastrada.
+ *       Não permite vincular usuários que já possuem outro perfil
+ *       ou cadastro de médico.
+ *     tags: [Médicos]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/VincularMedicoDTO'
+ *     responses:
+ *       201:
+ *         description: Usuário vinculado como médico com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Medico'
+ *             example:
+ *               id: "ee17aa1d-fdd9-4b35-8b5a-dc1fd857e389"
+ *               crm: "123456-SC"
+ *               telefone: "48999999999"
+ *               user:
+ *                 id: "94888c65-850a-4143-9aaf-c9330117ad1f"
+ *                 nome: "Dr. Marcos"
+ *                 email: "marcos@example.com"
+ *                 role: "MEDICO"
+ *                 criado_em: "2026-10-24T04:15:10.236Z"
+ *               especialidade:
+ *                 id: "d82c1dd8-4fad-420f-b2f6-90072de1baad"
+ *                 nome: "Cardiologia"
+ *       400:
+ *         description: Dados inválidos, UUID inválido ou campos obrigatórios ausentes.
+ *       401:
+ *         description: Token ausente, inválido ou expirado.
+ *       403:
+ *         description: Usuário sem permissão de acesso. Apenas ADMIN pode vincular médicos.
+ *       404:
+ *         description: Usuário ou especialidade não encontrado.
+ *       409:
+ *         description: Usuário já possui perfil, já está vinculado ou CRM já cadastrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+medicoRoutes.post(
+  "/vincular",
+  authMiddleware,
+  roleMiddleware(UserRole.ADMIN),
+  validateDTO(VincularMedicoDTO),
+  asyncHandler((req, res) => medicoController.vincular(req, res)),
 );
 
 /**

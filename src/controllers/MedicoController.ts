@@ -14,6 +14,15 @@ export class MedicoController {
       .json({ ...medico, user: removePassword(medico.user) });
   }
 
+  async vincular(req: Request, res: Response): Promise<Response> {
+    const medico = await this.medicoService.vincular(req.body);
+
+    return res.status(201).json({
+      ...medico,
+      user: removePassword(medico.user),
+    });
+  }
+
   async listar(req: Request, res: Response): Promise<Response> {
     const page = Number(req.query.page ?? 1);
     const limit = Number(req.query.limit ?? 10);
