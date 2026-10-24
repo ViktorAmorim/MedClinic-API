@@ -1,14 +1,12 @@
 import { AppDataSource } from "../database/data-source";
 import { Consulta, ConsultaStatus } from "../entities/Consulta";
 import { Especialidade } from "../entities/Especialidade";
-import { Paciente } from "../entities/Paciente";
 import type {
   ConsultaPorMedico,
   ConsultasPorStatus,
   MedicosPorEspecialidade,
   PacientesComConsultasAgendadas,
 } from "../interfaces/RelatorioInterfaces";
-import { ConsultaRepository } from "./ConsultaRepository";
 
 const consultaRepository = AppDataSource.getRepository(Consulta);
 const especialidadeRepository = AppDataSource.getRepository(Especialidade);
